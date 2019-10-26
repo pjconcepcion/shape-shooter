@@ -11,18 +11,20 @@ public class Player : MonoBehaviour
     private float _speed = 5.0f;
 
     [SerializeField]
-    private float _jumpHeight = 5.0f;
+    private float _jumpHeight = 5.5f;
 
-    private Rigidbody rb;
+    private Rigidbody _rb;
+    private GameObject _playerGround;
 
-    private bool _canJump = true;
+    private bool _canFirstJump = true;
+    private bool _canSecondJump = true;
 
     // Start is called before the first frame update
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        _rb = GetComponent<Rigidbody>();
 
-        if (rb == null)
+        if (_rb == null)
         {
             Debug.LogError("Rigidbody not found.");
         }
@@ -31,16 +33,32 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        Movement();
     }
 
     private void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.W) && _canJump)
+        Movement();
+
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), 0.5f))
         {
-            rb.velocity = new Vector3(0, _jumpHeight, 0);
-            rb.AddForce(rb.velocity);
-            _canJump = false;
+            _canFirstJump = true;
+            _canSecondJump = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.W) && _canSecondJump)
+        {
+            Jump();
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            Beam beam = _playerGround.GetComponent<Beam>();
+            if (beam == null)
+            {
+                Debug.Log("Beam not found.");
+            }
+
+            beam.OnBeamDisabled();
         }
     }
 
@@ -49,16 +67,27 @@ public class Player : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
 
         transform.Translate(new Vector3(horizontal, 0, 0) * _speed * Time.deltaTime);
-        if(_canJump)
+
+        if(_canFirstJump)
         {
             transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 12f), transform.position.y, 0);
         }
-
-        if (Physics.Raycast(transform.position, Vector3.down, 0.5f))
-        {
-            _canJump = true;
-        }
     }
 
-    
+    private void Jump()
+    {
+        if (_canFirstJump == false)
+        {
+            _canSecondJump = false;
+        }
+
+        _rb.velocity = new Vector3(0, _jumpHeight, 0);
+        _rb.AddForce(_rb.velocity);
+        _canFirstJump = false;
+    }
+
+    public void SetGround(GameObject beam)
+    {
+        _playerGround = beam;
+    }
 }
