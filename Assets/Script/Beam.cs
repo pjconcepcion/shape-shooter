@@ -17,12 +17,12 @@ public class Beam : MonoBehaviour
 
         if (_boxCollider == null)
         {
-            Debug.Log("BoxCollider not found.");
+            Debug.LogError("BoxCollider not found.");
         }
 
         if (_player == null)
         {
-            Debug.Log("Player not found.");
+            Debug.LogError("Player not found.");
         }
     }
 
