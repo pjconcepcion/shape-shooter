@@ -32,6 +32,7 @@ public class Beam : MonoBehaviour
         if (_player.transform.position.y < transform.position.y)
         {
             _boxCollider.isTrigger = true;
+            _isPlayerGoingDown = false;
         }
     }
 
@@ -50,10 +51,6 @@ public class Beam : MonoBehaviour
 
                 player.SetGround(this.gameObject);
                 _boxCollider.isTrigger = false;
-            }
-            else
-            {
-                _isPlayerGoingDown = false;
             }
         }
     }
