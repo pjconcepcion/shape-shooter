@@ -25,9 +25,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _bulletContainer;
 
-    private Rigidbody _rb;
+    private Rigidbody2D _rb;
     private GameObject _playerGround;
-    private RaycastHit _hit;
 
     private bool _canSecondJump = true;
     private bool _isInAir = false;    
@@ -35,11 +34,10 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        _rb = GetComponent<Rigidbody>();
-
+        _rb = GetComponent<Rigidbody2D>();
         if (_rb == null)
         {
-            Debug.LogError("Rigidbody not found.");
+            Debug.LogError("Rigidbody2D not found.");
         }
     }
 
@@ -51,27 +49,45 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         Movement();
-
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.down), out _hit))
+        OnInput();
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f);
+        if (hit.collider != null)
         {
-            if (_hit.distance == 0.5f && (_hit.transform.gameObject.tag != "Beam" || _hit.transform.gameObject.tag != "Floor"))
+            string tag = hit.transform.gameObject.tag;
+            if (hit.distance <= 0.52f && (tag == "Beam" || tag == "Floor" || tag == "Enemy"))
             {
                 _canSecondJump = true;
                 _isInAir = false;
             }
 
-            if (_hit.transform.gameObject.tag == "Beam")
+            if (tag == "Beam")
             {
-                _playerGround = _hit.transform.gameObject;
+                _playerGround = hit.transform.gameObject;
             }
         }
+    }
 
+    private void Movement()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+
+        transform.Translate(new Vector3(horizontal, 0, 0) * _speed * Time.deltaTime);
+
+        if(_isInAir == false)
+        {
+            transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 12f), transform.position.y, 0);
+        }
+    }
+
+    private void OnInput()
+    {
         if (Input.GetKeyDown(KeyCode.W) && _canSecondJump)
         {
+            _isInAir = true;
             Jump();
         }
 
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.S) && _playerGround != null)
         {
             Beam beam = _playerGround.GetComponent<Beam>();
 
@@ -95,18 +111,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Movement()
-    {
-        float horizontal = Input.GetAxis("Horizontal");
-
-        transform.Translate(new Vector3(horizontal, 0, 0) * _speed * Time.deltaTime);
-
-        if(_isInAir == false)
-        {
-            transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 12f), transform.position.y, 0);
-        }
-    }
-
     private void Jump()
     {
         if (_isInAir == true)
@@ -116,7 +120,6 @@ public class Player : MonoBehaviour
 
         _rb.velocity = new Vector3(0, _jumpHeight, 0);
         _rb.AddForce(_rb.velocity);
-        _isInAir = true;
     }
 
     private void OnFall(float speed)
