@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Beam : MonoBehaviour
 {
-    private BoxCollider _boxCollider;
+    private BoxCollider2D _boxCollider;
     private GameObject _player;
 
     private bool _isPlayerGoingDown = false;
@@ -12,7 +12,7 @@ public class Beam : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        _boxCollider = GetComponent<BoxCollider>();
+        _boxCollider = GetComponent<BoxCollider2D>();
         _player = GameObject.Find("Player");
 
         if (_boxCollider == null)
@@ -24,6 +24,8 @@ public class Beam : MonoBehaviour
         {
             Debug.LogError("Player not found.");
         }
+
+        StartCoroutine(DestroyRoutine());
     }
 
     // Update is called once per frame
@@ -36,10 +38,10 @@ public class Beam : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.tag == "Player")
-        {            
+        {
             if (other.transform.position.y >= transform.position.y && _isPlayerGoingDown == false)
             {
                 Player player = other.gameObject.GetComponent<Player>();
@@ -53,6 +55,12 @@ public class Beam : MonoBehaviour
                 _boxCollider.isTrigger = false;
             }
         }
+    }
+
+    IEnumerator DestroyRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);        
+        Destroy(this.gameObject);
     }
 
     public void OnBeamDisabled()

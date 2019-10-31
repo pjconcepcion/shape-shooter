@@ -10,7 +10,6 @@ public class Bullet : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -24,8 +23,8 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
+    private void OnTriggerEnter2D(Collider2D other)
+    {        
         if (other.gameObject.tag != "Player")
         {
             Destroy(this.gameObject);
