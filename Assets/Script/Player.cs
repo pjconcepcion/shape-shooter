@@ -29,7 +29,9 @@ public class Player : MonoBehaviour
     private GameObject _playerGround;
 
     private bool _canSecondJump = true;
-    private bool _isInAir = false;    
+    private bool _isInAir = false;
+    private bool _isStomping = false;
+    private int _pickupCtr = 0;
 
     // Start is called before the first frame update
     private void Start()
@@ -58,6 +60,11 @@ public class Player : MonoBehaviour
             {
                 _canSecondJump = true;
                 _isInAir = false;
+
+                if (tag == "Beam" || tag == "Floor")
+                {
+                    _isStomping = false;
+                }
             }
 
             if (tag == "Beam")
@@ -67,6 +74,21 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            if (_isStomping == true)
+            {
+                Destroy(other.gameObject);
+            }
+            else
+            {
+                OnDamage();
+            }
+        }
+    }
+    
     private void Movement()
     {
         float horizontal = Input.GetAxis("Horizontal");
@@ -106,7 +128,8 @@ public class Player : MonoBehaviour
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
-        {
+        {       
+             _isStomping = true;
             OnFall(_fallSpeed);
         }
     }
@@ -141,5 +164,30 @@ public class Player : MonoBehaviour
     public void SetGround(GameObject beam)
     {
         _playerGround = beam;
+    }
+
+    public void OnPickup()
+    {
+        _pickupCtr += 1;
+
+        if (_pickupCtr > 5)
+        {
+            _pickupCtr = 0;
+
+            if (_lifePoints < 5)
+            {
+                _lifePoints += 1;
+            }
+        }
+    }
+
+    public void OnDamage()
+    {
+        _lifePoints -= 1;
+
+        if (_lifePoints < 1)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

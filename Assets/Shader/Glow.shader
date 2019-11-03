@@ -1,4 +1,6 @@
-﻿Shader "Glow" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Glow" {
     Properties {
         _MainTex ("Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
@@ -33,7 +35,7 @@
 
                 v2f vert (vertIn v) {
                     v2f o;
-                    o.pos = mul(UNITY_MATRIX_MVP, v.pos);
+                    o.pos = UnityObjectToClipPos(v.pos);
                     o.tex = v.tex * _MainTex_ST.xy + _MainTex_ST.zw;
                     return o;
                 }

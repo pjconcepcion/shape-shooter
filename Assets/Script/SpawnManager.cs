@@ -43,7 +43,7 @@ public class SpawnManager : MonoBehaviour
             GameObject newBeam = Instantiate(_beamPrefab[_prefabIndex], position, Quaternion.identity);
             newBeam.tag = "Beam";
             newBeam.AddComponent<Beam>();
-            yield return new WaitForSeconds(10.0f);
+            yield return new WaitForSeconds(Random.Range(5f, 10f));
         }
     }
 
