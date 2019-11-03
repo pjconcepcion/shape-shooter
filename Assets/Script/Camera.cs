@@ -24,6 +24,9 @@ public class Camera : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.position = new Vector3(_player.transform.position.x, _player.transform.position.y + 3, -10);
+        if (_player != null)
+        {
+            transform.position = new Vector3(_player.transform.position.x, _player.transform.position.y + 3, -10);
+        }
     }
 }

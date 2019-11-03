@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 7143746100704541182}
   - component: {fileID: 326825337483022730}
   - component: {fileID: 5648044756045704828}
+  - component: {fileID: -8006822289857324897}
+  - component: {fileID: 8348719153660062395}
   m_Layer: 0
   m_Name: Banana
   m_TagString: Untagged
@@ -101,3 +103,31 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &-8006822289857324897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6637258026369320006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b067b1d5cb121da449d55e4d05974336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!58 &8348719153660062395
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6637258026369320006}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.003969733, y: 0.0071455957}
+  serializedVersion: 2
+  m_Radius: 0.06472597

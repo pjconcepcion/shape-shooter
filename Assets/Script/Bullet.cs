@@ -8,12 +8,12 @@ public class Bullet : MonoBehaviour
     private float _speed = 15.0f;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         transform.Translate(Vector3.right * _speed * Time.deltaTime);
 
@@ -24,8 +24,20 @@ public class Bullet : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other)
-    {        
-        if (other.gameObject.tag != "Player")
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            Enemy enemy = other.gameObject.GetComponent<Enemy>();
+
+            if (enemy == null)
+            {
+                Debug.LogError("Enemy not found");
+            }
+
+            enemy.OnDamage();
+        }
+
+        if (other.gameObject.tag == "Beam" || other.gameObject.tag == "Floor")
         {
             Destroy(this.gameObject);
         }

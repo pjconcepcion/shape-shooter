@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -4196373785904656006}
   m_Layer: 0
   m_Name: Bullet
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -104,7 +104,7 @@ CircleCollider2D:
   m_GameObject: {fileID: 4971680142071130555}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 308af0c48f3fca14aa5efeae5fb73c13, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
