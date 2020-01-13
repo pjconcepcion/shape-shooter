@@ -35,6 +35,7 @@ public class Bullet : MonoBehaviour
             }
 
             enemy.OnDamage();
+            Destroy(this.gameObject);
         }
 
         if (other.gameObject.tag == "Beam" || other.gameObject.tag == "Floor")

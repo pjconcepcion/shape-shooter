@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour
     private Vector3 _moveDirection = Vector3.zero;
     private Vector3 _lookDirection = Vector3.down;
     private Rigidbody2D _rb;
+    private SpriteRenderer _spriteRenderer;
 
     private float _destPosition = 0;
     private float _canChangeLookTime = 0.0f;
@@ -27,6 +28,18 @@ public class Enemy : MonoBehaviour
     private void Start()
     {   
         _rb = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // null checking component
+        if (_rb == null)
+        {
+            Debug.LogError("RigidBody is null");
+        } 
+
+        if (_spriteRenderer == null)
+        {
+            Debug.LogError("Sprite Renderer is null");
+        }
 
         if (Random.Range(0,2) == 1) // 1 = Left; 0 = Right
         {
@@ -146,7 +159,8 @@ public class Enemy : MonoBehaviour
     public void OnDamage()
     {
         _lifePoints -= 1;
-
+        float intensity = _spriteRenderer.material.GetFloat("_Glow");
+        _spriteRenderer.material.SetFloat("_Glow", intensity - 0.15f);
         if (_lifePoints < 1)
         {
             Destroy(this.gameObject);
