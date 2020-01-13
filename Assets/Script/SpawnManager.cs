@@ -25,7 +25,7 @@ public class SpawnManager : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        StartCoroutine(BeamRoutine());
+        // StartCoroutine(BeamRoutine());
         StartCoroutine(EnemyRoutine());
         StartCoroutine(PickupRoutine());
     }
@@ -39,11 +39,11 @@ public class SpawnManager : MonoBehaviour
     {
         while(true)
         {
+            yield return new WaitForSeconds(Random.Range(5f, 10f));
             Vector3 position = new Vector3(Random.Range(-11f, 11f), Random.Range(2f, 5f), 0);
             GameObject newBeam = Instantiate(_beamPrefab[_prefabIndex], position, Quaternion.identity);
             newBeam.tag = "Beam";
             newBeam.AddComponent<Beam>();
-            yield return new WaitForSeconds(Random.Range(5f, 10f));
         }
     }
 
@@ -51,10 +51,10 @@ public class SpawnManager : MonoBehaviour
     {
         while(true)
         {
+            yield return new WaitForSeconds(Random.Range(3f, 5f));
             Vector3 position =  new Vector3(Random.Range(-11f, 11f), Random.Range(5f, 8f), 0);
             GameObject newEnemy = Instantiate(_enemyPrefab, position, Quaternion.identity);
             newEnemy.transform.parent = _enemyContainer.transform;
-            yield return new WaitForSeconds(Random.Range(3f, 5f));
         }
     }
 
@@ -62,11 +62,11 @@ public class SpawnManager : MonoBehaviour
     {
         while(true)
         {
+            yield return new WaitForSeconds(Random.Range(4f,6f));
             Vector3 position = new Vector3(Random.Range(-11f,11f), Random.Range(2f, 4f), 0);
             int pickupIndex = Random.Range(0,_pickupPrefab.Length);
             GameObject newPickup = Instantiate(_pickupPrefab[pickupIndex], position, Quaternion.identity);
             newPickup.transform.parent = _pickupContainer.transform;
-            yield return new WaitForSeconds(Random.Range(4f,6f));
         }
     }
 }

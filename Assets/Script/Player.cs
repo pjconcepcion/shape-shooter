@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rb;
     private GameObject _playerGround;
 
-    private bool _canSecondJump = true;
+    private bool _canSecondJump = false;
     private bool _isInAir = false;
     private bool _isStomping = false;
     private int _pickupCtr = 0;
@@ -97,7 +97,7 @@ public class Player : MonoBehaviour
 
         if(_isInAir == false)
         {
-            transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 12f), transform.position.y, 0);
+            transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 14f), transform.position.y, 0);
         }
     }
 
@@ -126,10 +126,10 @@ public class Player : MonoBehaviour
         {
             Shoot();
         }
-
+        
         if (Input.GetKeyDown(KeyCode.Space))
-        {       
-             _isStomping = true;
+        {
+            _isStomping = true;
             OnFall(_fallSpeed);
         }
     }
