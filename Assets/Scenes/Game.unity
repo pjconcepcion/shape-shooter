@@ -407,9 +407,14 @@ MonoBehaviour:
   _jumpHeight: 5.5
   _fallSpeed: 20
   _floorFallSpeed: 15
-  _bulletPrefab: {fileID: 4971680142071130555, guid: c6c457b76ea70d447a2279d7fbd37107,
-    type: 3}
+  _bulletPrefab:
+  - {fileID: 2523315265008038180, guid: 412e29d7382fa4444b11a89a2a3b746b, type: 3}
+  - {fileID: 1506277473436911902, guid: e4c1c794631708041bb808cdeeabcd79, type: 3}
+  - {fileID: 5739865890042175927, guid: 91f600ee9b185ee42bac24e75ce1efdb, type: 3}
+  - {fileID: 5739865890042175927, guid: 91f600ee9b185ee42bac24e75ce1efdb, type: 3}
+  - {fileID: 5354374056049785938, guid: b63d063cd604662408b3953d0ac1a7df, type: 3}
   _bulletContainer: {fileID: 1329971862}
+  _reloadRate: 3
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -448,7 +453,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.17101282, g: 0.18163323, b: 0.1981132, a: 0}
+  m_BackGroundColor: {r: 0.3301887, g: 0.3301887, b: 0.3301887, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
