@@ -20,18 +20,24 @@ public class Player : MonoBehaviour
     private float _floorFallSpeed = 15.0f;
 
     [SerializeField]
-    private GameObject _bulletPrefab;
+    private GameObject[] _bulletPrefab;
 
     [SerializeField]
     private GameObject _bulletContainer;
 
+    [SerializeField]
+    private float _reloadRate = 3.0f;
+
     private Rigidbody2D _rb;
     private GameObject _playerGround;
+    private GameManager _gameManager;
 
     private bool _canSecondJump = false;
     private bool _isInAir = false;
     private bool _isStomping = false;
     private int _pickupCtr = 0;
+    private int ammo = 5;
+    private float _reloadTime = 0;
 
     // Start is called before the first frame update
     private void Start()
@@ -41,17 +47,29 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("Rigidbody2D not found.");
         }
+
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        if (_gameManager == null)
+        {
+            Debug.LogError("Game Manager not found.");
+        }
     }
 
     // Update is called once per frame
     private void Update()
     {
+        OnInput();
+        if(Time.time > _reloadTime)
+        {
+            ammo = 5;
+            _reloadTime = Time.time + _reloadRate;
+        }
     }
 
     private void FixedUpdate()
     {
         Movement();
-        OnInput();
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f);
         if (hit.collider != null)
         {
@@ -98,6 +116,12 @@ public class Player : MonoBehaviour
         if(_isInAir == false)
         {
             transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 14f), transform.position.y, 0);
+        }
+
+        if(transform.position.y < -20f)
+        {
+            Destroy(this.gameObject);
+            // _gameManager.SetGameOver(true);
         }
     }
 
@@ -153,12 +177,17 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        Vector3 mousePosition = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
-        mousePosition.z = 0;
+        if(ammo > 0)
+        {
+            Vector3 mousePosition = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
+            mousePosition.z = 0;
 
-        float angle = Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg;
-        GameObject newBullet = Instantiate(_bulletPrefab, transform.position, Quaternion.AngleAxis(angle, Vector3.forward));
-        newBullet.transform.parent = _bulletContainer.transform;
+            float angle = Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg;
+            int bulletNumber = Random.Range(0,5);
+            GameObject newBullet = Instantiate(_bulletPrefab[bulletNumber], transform.position, Quaternion.AngleAxis(angle, Vector3.forward));
+            newBullet.transform.parent = _bulletContainer.transform;
+            ammo -= 1;
+        }
     }
 
     public void SetGround(GameObject beam)

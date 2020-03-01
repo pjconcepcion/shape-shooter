@@ -5,7 +5,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField]
-    private float _speed = 15.0f;
+    private float _speed = 11.5f;
 
     // Start is called before the first frame update
     private void Start()
