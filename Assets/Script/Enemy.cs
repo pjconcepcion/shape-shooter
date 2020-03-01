@@ -17,6 +17,7 @@ public class Enemy : MonoBehaviour
     private Vector3 _lookDirection = Vector3.down;
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRenderer;
+    private UIManager _uiManager;
 
     private float _destPosition = 0;
     private float _canChangeLookTime = 0.0f;
@@ -29,6 +30,7 @@ public class Enemy : MonoBehaviour
     {   
         _rb = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 
         // null checking component
         if (_rb == null)
@@ -50,6 +52,11 @@ public class Enemy : MonoBehaviour
         {
             _lookDirection = Vector3.right;
             _moveDirection = Vector3.right;
+        }
+
+        if(_uiManager == null)
+        {
+            Debug.LogError("UI Manager not found.");
         }
 
         StartCoroutine(JumpRoutine());
@@ -163,6 +170,8 @@ public class Enemy : MonoBehaviour
         _spriteRenderer.material.SetFloat("_Glow", intensity - 0.15f);
         if (_lifePoints < 1)
         {
+            int score = Random.Range(20,30);
+            _uiManager.UpdateScore(score);
             Destroy(this.gameObject);
         }
     }
