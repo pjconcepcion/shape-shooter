@@ -27,6 +27,7 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D _rb;
     private GameObject _playerGround;
+    private GameManager _gameManager;
 
     private bool _canSecondJump = false;
     private bool _isInAir = false;
@@ -40,6 +41,13 @@ public class Player : MonoBehaviour
         if (_rb == null)
         {
             Debug.LogError("Rigidbody2D not found.");
+        }
+
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        if (_gameManager == null)
+        {
+            Debug.LogError("Game Manager not found.");
         }
     }
 
@@ -98,6 +106,12 @@ public class Player : MonoBehaviour
         if(_isInAir == false)
         {
             transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 14f), transform.position.y, 0);
+        }
+
+        if(transform.position.y < -20f)
+        {
+            Destroy(this.gameObject);
+            _gameManager.SetGameOver(true);
         }
     }
 
