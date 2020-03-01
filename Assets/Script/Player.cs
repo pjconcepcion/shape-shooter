@@ -28,42 +28,59 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _reloadRate = 3.0f;
 
+    [SerializeField]
+    private GameObject[] _bullets = new GameObject[5];
+
     private Rigidbody2D _rb;
     private GameObject _playerGround;
     private GameManager _gameManager;
+    private UIManager _uiManager;
 
     private bool _canSecondJump = false;
     private bool _isInAir = false;
     private bool _isStomping = false;
     private int _pickupCtr = 0;
-    private int ammo = 5;
+    private int _maxAmmo = 5;
+    private int _ammo = 0;
     private float _reloadTime = 0;
 
     // Start is called before the first frame update
     private void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
         if (_rb == null)
         {
             Debug.LogError("Rigidbody2D not found.");
         }
 
-        _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-
         if (_gameManager == null)
         {
             Debug.LogError("Game Manager not found.");
         }
+
+        if(_uiManager == null)
+        {
+            Debug.LogError("UI Manager not found.");
+        }
+
+        Reload();
     }
 
     // Update is called once per frame
     private void Update()
     {
         OnInput();
+
         if(Time.time > _reloadTime)
         {
-            ammo = 5;
-            _reloadTime = Time.time + _reloadRate;
+            _reloadTime = Time.time + _reloadRate;  
+            if(_ammo == 0)
+            {
+                Reload();
+            }
         }
     }
 
@@ -98,6 +115,9 @@ public class Player : MonoBehaviour
         {
             if (_isStomping == true)
             {
+                int score = Random.Range(20,30);
+                _uiManager.UpdateScore(score);
+                
                 Destroy(other.gameObject);
             }
             else
@@ -177,17 +197,31 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        if(ammo > 0)
+        if(_ammo > 0)
         {
             Vector3 mousePosition = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
             mousePosition.z = 0;
+            _ammo -= 1;
 
             float angle = Mathf.Atan2(mousePosition.y, mousePosition.x) * Mathf.Rad2Deg;
-            int bulletNumber = Random.Range(0,5);
-            GameObject newBullet = Instantiate(_bulletPrefab[bulletNumber], transform.position, Quaternion.AngleAxis(angle, Vector3.forward));
+            GameObject newBullet = Instantiate(_bullets[_ammo], transform.position, Quaternion.AngleAxis(angle, Vector3.forward));
             newBullet.transform.parent = _bulletContainer.transform;
-            ammo -= 1;
+
+            _uiManager.RemoveBullet(_ammo);
         }
+    }
+
+    private void Reload()
+    {
+        for(int ctr = 0; ctr < _maxAmmo; ctr++ )
+        {
+            int bulletNumber = Random.Range(0,5);
+            _bullets[ctr] = _bulletPrefab[bulletNumber];
+            _uiManager.AddBullet(bulletNumber, ctr);
+        }
+
+        _reloadTime = Time.time + _reloadRate;
+        _ammo = _maxAmmo;
     }
 
     public void SetGround(GameObject beam)
@@ -199,13 +233,14 @@ public class Player : MonoBehaviour
     {
         _pickupCtr += 1;
 
-        if (_pickupCtr > 5)
+        if (_pickupCtr == 3)
         {
             _pickupCtr = 0;
 
             if (_lifePoints < 5)
             {
                 _lifePoints += 1;
+                _uiManager.UpdateLife(_lifePoints);
             }
         }
     }
@@ -213,6 +248,7 @@ public class Player : MonoBehaviour
     public void OnDamage()
     {
         _lifePoints -= 1;
+        _uiManager.UpdateLife(_lifePoints);
 
         if (_lifePoints < 1)
         {
