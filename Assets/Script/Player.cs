@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
         if(transform.position.y < -20f)
         {
             Destroy(this.gameObject);
-            // _gameManager.SetGameOver(true);
+            _gameManager.SetGameOver(true);
         }
     }
 

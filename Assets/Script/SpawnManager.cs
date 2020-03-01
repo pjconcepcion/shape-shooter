@@ -22,6 +22,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _prefabIndex;
     
+    private bool _isGameOver = false;
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -37,7 +39,7 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator BeamRoutine()
     {
-        while(true)
+        while(!_isGameOver)
         {
             yield return new WaitForSeconds(Random.Range(5f, 10f));
             Vector3 position = new Vector3(Random.Range(-11f, 11f), Random.Range(2f, 5f), 0);
@@ -49,7 +51,7 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator EnemyRoutine()
     {
-        while(true)
+        while(!_isGameOver)
         {
             yield return new WaitForSeconds(Random.Range(3f, 5f));
             Vector3 position =  new Vector3(Random.Range(-11f, 11f), Random.Range(5f, 8f), 0);
@@ -60,7 +62,7 @@ public class SpawnManager : MonoBehaviour
 
     IEnumerator PickupRoutine()
     {
-        while(true)
+        while(!_isGameOver)
         {
             yield return new WaitForSeconds(Random.Range(4f,6f));
             Vector3 position = new Vector3(Random.Range(-11f,11f), Random.Range(2f, 4f), 0);
@@ -68,5 +70,10 @@ public class SpawnManager : MonoBehaviour
             GameObject newPickup = Instantiate(_pickupPrefab[pickupIndex], position, Quaternion.identity);
             newPickup.transform.parent = _pickupContainer.transform;
         }
+    }
+
+    public void SetGameOver(bool isGameOver)
+    {
+        _isGameOver = isGameOver;
     }
 }
