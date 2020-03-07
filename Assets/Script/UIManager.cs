@@ -9,6 +9,9 @@ public class UIManager : MonoBehaviour
     private Text _scoreText;
 
     [SerializeField]
+    private Text _scorePauseText;
+
+    [SerializeField]
     private Image _lifeImage;
 
     [SerializeField]
@@ -30,12 +33,6 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         _scoreText.text = "Score: " + _score;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void UpdateScore(int score)
@@ -70,5 +67,24 @@ public class UIManager : MonoBehaviour
         {
             bulletImage.OnShoot();
         }
+    }
+
+    public void ResumeGame()
+    {
+        GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        
+        if(gameManager == null)
+        {
+            Debug.LogError("Game Manager not found.");
+        }
+
+        gameManager.ResumeGame();
+        _scoreText.gameObject.SetActive(true);
+    }
+
+    public void PauseGame()
+    {
+        _scorePauseText.text = "Score: " + _score;
+        _scoreText.gameObject.SetActive(false);
     }
 }

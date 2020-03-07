@@ -8,7 +8,7 @@ public class SpawnManager : MonoBehaviour
     private GameObject[] _beamPrefab;
 
     [SerializeField]
-    private GameObject _enemyPrefab;
+    private GameObject[] _enemyPrefab;
 
     [SerializeField]
     private GameObject _enemyContainer;
@@ -55,7 +55,8 @@ public class SpawnManager : MonoBehaviour
         {
             yield return new WaitForSeconds(Random.Range(3f, 5f));
             Vector3 position =  new Vector3(Random.Range(-11f, 11f), Random.Range(5f, 8f), 0);
-            GameObject newEnemy = Instantiate(_enemyPrefab, position, Quaternion.identity);
+            int enemyNumber = Random.Range(0, _enemyPrefab.Length);
+            GameObject newEnemy = Instantiate(_enemyPrefab[enemyNumber], position, Quaternion.identity);            
             newEnemy.transform.parent = _enemyContainer.transform;
         }
     }

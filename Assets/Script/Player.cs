@@ -23,6 +23,21 @@ public class Player : MonoBehaviour
     private GameObject[] _bulletPrefab;
 
     [SerializeField]
+    private AudioClip _audioJump;
+
+    [SerializeField]
+    private AudioClip _audioDamage;
+
+    [SerializeField]
+    private AudioClip _audioStomp;
+
+    [SerializeField]
+    private AudioClip _audioLife;
+
+    [SerializeField]
+    private AudioClip _audioPickup;
+
+    [SerializeField]
     private GameObject _bulletContainer;
 
     [SerializeField]
@@ -35,6 +50,7 @@ public class Player : MonoBehaviour
     private GameObject _playerGround;
     private GameManager _gameManager;
     private UIManager _uiManager;
+    private AudioSource _audioSource;
 
     private bool _canSecondJump = false;
     private bool _isInAir = false;
@@ -48,15 +64,22 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
+
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 
-        if (_rb == null)
+        if(_rb == null)
         {
             Debug.LogError("Rigidbody2D not found.");
         }
 
-        if (_gameManager == null)
+        if(_audioSource == null)
+        {
+            Debug.LogError("Audio Source not found.");
+        }
+
+        if(_gameManager == null)
         {
             Debug.LogError("Game Manager not found.");
         }
@@ -88,10 +111,10 @@ public class Player : MonoBehaviour
     {
         Movement();
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f);
-        if (hit.collider != null)
+        if(hit.collider != null)
         {
             string tag = hit.transform.gameObject.tag;
-            if (hit.distance <= 0.52f && (tag == "Beam" || tag == "Floor" || tag == "Enemy"))
+            if(hit.distance <= 0.52f && (tag == "Beam" || tag == "Floor" || tag == "Enemy"))
             {
                 _canSecondJump = true;
                 _isInAir = false;
@@ -102,7 +125,7 @@ public class Player : MonoBehaviour
                 }
             }
 
-            if (tag == "Beam")
+            if(tag == "Beam")
             {
                 _playerGround = hit.transform.gameObject;
             }
@@ -111,9 +134,9 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Enemy")
+        if(other.gameObject.tag == "Enemy")
         {
-            if (_isStomping == true)
+            if(_isStomping == true)
             {
                 int score = Random.Range(20,30);
                 _uiManager.UpdateScore(score);
@@ -124,6 +147,15 @@ public class Player : MonoBehaviour
             {
                 OnDamage();
             }
+        }       
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.gameObject.tag == "Pickup")
+        {
+            OnPickup();
+            Destroy(other.gameObject);
         }
     }
     
@@ -174,6 +206,7 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _isStomping = true;
+            _audioSource.PlayOneShot(_audioStomp);
             OnFall(_fallSpeed);
         }
     }
@@ -182,6 +215,7 @@ public class Player : MonoBehaviour
     {
         if (_isInAir == true)
         {
+            _audioSource.PlayOneShot(_audioJump, 0.6f);
             _canSecondJump = false;
         }
 
@@ -197,7 +231,7 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        if(_ammo > 0)
+        if(_ammo > 0 && !_gameManager.GetIsGamePause())
         {
             Vector3 mousePosition = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
             mousePosition.z = 0;
@@ -231,6 +265,7 @@ public class Player : MonoBehaviour
 
     public void OnPickup()
     {
+        _audioSource.PlayOneShot(_audioPickup);
         _pickupCtr += 1;
 
         if (_pickupCtr == 3)
@@ -241,6 +276,7 @@ public class Player : MonoBehaviour
             {
                 _lifePoints += 1;
                 _uiManager.UpdateLife(_lifePoints);
+                _audioSource.PlayOneShot(_audioLife);
             }
         }
     }
@@ -249,7 +285,8 @@ public class Player : MonoBehaviour
     {
         _lifePoints -= 1;
         _uiManager.UpdateLife(_lifePoints);
-
+        _audioSource.PlayOneShot(_audioDamage);
+        
         if (_lifePoints < 1)
         {
             Destroy(this.gameObject);
