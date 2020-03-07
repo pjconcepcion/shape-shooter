@@ -13,11 +13,15 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private bool _isPlayerLocated = false;
 
+    [SerializeField]
+    private GameObject _breakPrefab;
+
     private Vector3 _moveDirection = Vector3.zero;
     private Vector3 _lookDirection = Vector3.down;
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRenderer;
     private UIManager _uiManager;
+    private AudioSource _audioSource;
 
     private float _destPosition = 0;
     private float _canChangeLookTime = 0.0f;
@@ -29,6 +33,7 @@ public class Enemy : MonoBehaviour
     private void Start()
     {   
         _rb = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 
@@ -37,6 +42,11 @@ public class Enemy : MonoBehaviour
         {
             Debug.LogError("RigidBody is null");
         } 
+
+        if(_audioSource == null)
+        {
+            Debug.LogError("Audio Source is null");
+        }
 
         if (_spriteRenderer == null)
         {
@@ -128,7 +138,7 @@ public class Enemy : MonoBehaviour
     private void Movement()
     {        
         transform.Translate(_moveDirection * _speed * Time.deltaTime);
-        transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 12f), transform.position.y ,0);
+        transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 14f), transform.position.y ,0);
     }
 
     private void ChangeDirection()
@@ -147,6 +157,7 @@ public class Enemy : MonoBehaviour
         {
             _rb.velocity = new Vector3(0, _jumpHeight, 0);
             _rb.AddForce(_rb.velocity);
+            _audioSource.Play();
         }
         _isInAir = true;
     }
@@ -166,13 +177,13 @@ public class Enemy : MonoBehaviour
     public void OnDamage()
     {
         _lifePoints -= 1;
-        float intensity = _spriteRenderer.material.GetFloat("_Glow");
-        _spriteRenderer.material.SetFloat("_Glow", intensity - 0.15f);
         if (_lifePoints < 1)
         {
             int score = Random.Range(20,30);
             _uiManager.UpdateScore(score);
             Destroy(this.gameObject);
+            GameObject newBreak = Instantiate(_breakPrefab, transform.position, Quaternion.identity);
+            newBreak.transform.parent = transform.parent;
         }
     }
 }
