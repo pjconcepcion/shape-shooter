@@ -59,6 +59,8 @@ public class Player : MonoBehaviour
     private int _maxAmmo = 5;
     private int _ammo = 0;
     private float _reloadTime = 0;
+    private int _score = 10;
+    private int _maxLifePoints = 5;
 
     // Start is called before the first frame update
     private void Start()
@@ -95,7 +97,10 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        OnInput();
+        if(_gameManager.GetIsGameReady() && !_gameManager.GetIsGamePause())
+        {
+            OnInput();
+        }
 
         if(Time.time > _reloadTime)
         {
@@ -109,27 +114,8 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        CheckCollision();
         Movement();
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f);
-        if(hit.collider != null)
-        {
-            string tag = hit.transform.gameObject.tag;
-            if(hit.distance <= 0.52f && (tag == "Beam" || tag == "Floor" || tag == "Enemy"))
-            {
-                _canSecondJump = true;
-                _isInAir = false;
-
-                if (tag == "Beam" || tag == "Floor")
-                {
-                    _isStomping = false;
-                }
-            }
-
-            if(tag == "Beam")
-            {
-                _playerGround = hit.transform.gameObject;
-            }
-        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -138,8 +124,7 @@ public class Player : MonoBehaviour
         {
             if(_isStomping == true)
             {
-                int score = Random.Range(20,30);
-                _uiManager.UpdateScore(score);
+                _uiManager.UpdateScore(_score);
                 
                 Destroy(other.gameObject);
             }
@@ -165,11 +150,6 @@ public class Player : MonoBehaviour
 
         transform.Translate(new Vector3(horizontal, 0, 0) * _speed * Time.deltaTime);
 
-        if(_isInAir == false)
-        {
-            transform.position = new Vector3(Mathf.Clamp(transform.position.x, -12f, 14f), transform.position.y, 0);
-        }
-
         if(transform.position.y < -20f)
         {
             Destroy(this.gameObject);
@@ -177,25 +157,30 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void CheckCollision()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1f);
+        if(hit.collider != null)
+        {
+            string tag = hit.transform.gameObject.tag;
+            if(hit.distance <= 0.52f && (tag == "Floor" || tag == "Enemy"))
+            {
+                _canSecondJump = true;
+                _isInAir = false;
+
+                if (tag == "Beam" || tag == "Floor")
+                {
+                    _isStomping = false;
+                }
+            }
+        }
+    }
+
     private void OnInput()
     {
         if (Input.GetKeyDown(KeyCode.W) && _canSecondJump)
         {
-            _isInAir = true;
             Jump();
-        }
-
-        if (Input.GetKeyDown(KeyCode.S) && _playerGround != null)
-        {
-            Beam beam = _playerGround.GetComponent<Beam>();
-
-            if (beam == null)
-            {
-                Debug.Log("Beam not found.");
-            }
-
-            beam.OnBeamDisabled();
-            OnFall(_floorFallSpeed);
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -213,14 +198,15 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        if (_isInAir == true)
-        {
-            _audioSource.PlayOneShot(_audioJump, 0.6f);
-            _canSecondJump = false;
-        }
-
+        _audioSource.PlayOneShot(_audioJump, 0.6f);
         _rb.velocity = new Vector3(0, _jumpHeight, 0);
         _rb.AddForce(_rb.velocity);
+        
+        _isInAir = true;
+        if (_isInAir == true)
+        {
+            _canSecondJump = false;
+        }
     }
 
     private void OnFall(float speed)
@@ -231,7 +217,7 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        if(_ammo > 0 && !_gameManager.GetIsGamePause())
+        if(_ammo > 0)
         {
             Vector3 mousePosition = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
             mousePosition.z = 0;
@@ -258,21 +244,20 @@ public class Player : MonoBehaviour
         _ammo = _maxAmmo;
     }
 
-    public void SetGround(GameObject beam)
-    {
-        _playerGround = beam;
-    }
-
     public void OnPickup()
     {
         _audioSource.PlayOneShot(_audioPickup);
-        _pickupCtr += 1;
+
+        if(_lifePoints != _maxLifePoints)
+        {
+            _pickupCtr += 1;
+        }
 
         if (_pickupCtr == 3)
         {
             _pickupCtr = 0;
 
-            if (_lifePoints < 5)
+            if (_lifePoints < _maxLifePoints)
             {
                 _lifePoints += 1;
                 _uiManager.UpdateLife(_lifePoints);
@@ -290,6 +275,7 @@ public class Player : MonoBehaviour
         if (_lifePoints < 1)
         {
             Destroy(this.gameObject);
+            _gameManager.SetGameOver(true);
         }
     }
 }

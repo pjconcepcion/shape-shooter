@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,54 +12,112 @@ public class GameManager : MonoBehaviour
     private GameObject _floorContainer;
 
     [SerializeField]
-    private GameObject _pauseMenuPanel; 
+    private GameObject _pauseMenuPanel;
+
+    [SerializeField]
+    private GameObject _helpPanel;
+
+    [SerializeField]
+    private AudioClip _audioGameOver;
+
+    [SerializeField]
+    private AudioClip _audioGameStart;
 
     private bool _isGameReady = false;  
     private bool _isGameOver = false;
     private bool _isGamePause = false;
+    private bool _isPlayGameOver = false;
     private SpawnManager _spawnManager;
+    private UIManager _uiManager;
+    private AudioSource _audioSource;
+    private string MAIN_MENU = "MainMenu";
 
     // Start is called before the first frame update
     private void Start()
     {
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _audioSource = GetComponent<AudioSource>();
+        Background background = GameObject.Find("Background").GetComponent<Background>();
 
         if(_spawnManager == null)
         {
             Debug.LogError("Spawn Manager not found.");
         }
+
+        if(_uiManager == null)
+        {
+            Debug.LogError("UI Manager not found.");
+        }
+
+        if(_audioSource == null)
+        {
+            Debug.LogError("Audio Source not found.");
+        }
+
+        if(background == null)
+        {
+            Debug.LogError("Background not found.");
+        }
         
         SetGameFloor();
+        background.SetBackground();
 
         Time.timeScale = 0;
         _pauseMenuPanel.SetActive(_isGamePause);
+        _helpPanel.SetActive(_isGamePause);
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && !_isGameReady)
-        {
-            _isGameReady = true;
-            Time.timeScale = 1f;
-        }
 
-        if(Input.GetKeyDown(KeyCode.Escape))
+        if(!_isGameOver)
         {
-            if(_isGamePause)
+            if(_isGameReady)
             {
-                ResumeGame();
+                if(Input.GetKeyDown(KeyCode.Escape))
+                {
+                    if(_isGamePause)
+                    {
+                        _uiManager.ResumeGame();
+                    }
+                    else
+                    {
+                        PauseGame(KeyCode.Escape);
+                    }
+                }
+
+                if(Input.GetKeyDown(KeyCode.H))
+                {
+                    if(_isGamePause)
+                    {
+                        _uiManager.ResumeGame();
+                    }
+                    else
+                    {
+                        PauseGame(KeyCode.H);
+                    }
+                }
             }
-            else
-            {
-                PauseGame();
+            else{
+                if(Input.GetKeyDown(KeyCode.Space))
+                {
+                    _isGameReady = true;
+                    _audioSource.PlayOneShot(_audioGameStart);
+                    _uiManager.StartGame();
+                    Time.timeScale = 1f;
+                }
+
+                if(Input.GetKeyDown(KeyCode.Escape))
+                {
+                    QuitGame();
+                }
             }
         }
-
-        if(_isGameOver)
+        else
         {
-            Time.timeScale = 0f;
-            _spawnManager.SetGameOver(_isGameOver);
+            GameOver();
         }
     }
 
@@ -71,6 +130,19 @@ public class GameManager : MonoBehaviour
             newFloor.transform.parent = _floorContainer.transform;
             newFloor.tag = "Floor";
             x += 3;
+        }
+    }
+
+    private void GameOver()
+    {
+        PauseGame(KeyCode.Escape);
+        Time.timeScale = 0f;
+        _uiManager.GameOver();
+
+        if(!_isPlayGameOver)
+        {
+            _audioSource.PlayOneShot(_audioGameOver, 0.45f);
+            _isPlayGameOver = true;
         }
     }
 
@@ -89,20 +161,42 @@ public class GameManager : MonoBehaviour
         return _isGamePause;
     }
 
+    public bool GetIsGameReady()
+    {
+        return _isGameReady;
+    }
+
     public void ResumeGame()
     {
         SetGamePause(false);
         _pauseMenuPanel.SetActive(_isGamePause);
+        _helpPanel.SetActive(_isGamePause);
         Time.timeScale = 1f;
     }
 
-    public void PauseGame()
-    {        
-        UIManager _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+    public void PauseGame(KeyCode key)
+    {
         _uiManager.PauseGame();
-
         SetGamePause(true);
-        _pauseMenuPanel.SetActive(_isGamePause);
+
+        if(key == KeyCode.Escape)
+        {
+            _pauseMenuPanel.SetActive(_isGamePause);
+        }
+        else{
+            _helpPanel.SetActive(_isGamePause);
+        }
+        
         Time.timeScale = 0f;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void QuitGame()
+    {
+        SceneManager.LoadScene(MAIN_MENU);
     }
 }
