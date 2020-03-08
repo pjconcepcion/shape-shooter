@@ -28,6 +28,7 @@ public class Enemy : MonoBehaviour
     private float _lookTime = 2.0f;
     private float _jumpHeight = 5.0f;
     private bool _isInAir = false;
+    private int _score = 10;
     
     // Start is called before the first frame update
     private void Start()
@@ -125,6 +126,12 @@ public class Enemy : MonoBehaviour
         {
             ChangeDirection();
         }
+
+        if(other.gameObject.tag == "Player")
+        {
+            _isPlayerLocated = false;  
+            ChangeDirection();          
+        }
     }
 
     private void OnCollisionStay2D(Collision2D other)
@@ -164,7 +171,7 @@ public class Enemy : MonoBehaviour
 
     IEnumerator JumpRoutine()
     {
-        while(true)
+        while(_isInAir)
         {   
             if(_isPlayerLocated == false)
             {
@@ -179,8 +186,7 @@ public class Enemy : MonoBehaviour
         _lifePoints -= 1;
         if (_lifePoints < 1)
         {
-            int score = Random.Range(20,30);
-            _uiManager.UpdateScore(score);
+            _uiManager.UpdateScore(_score);
             Destroy(this.gameObject);
             GameObject newBreak = Instantiate(_breakPrefab, transform.position, Quaternion.identity);
             newBreak.transform.parent = transform.parent;
