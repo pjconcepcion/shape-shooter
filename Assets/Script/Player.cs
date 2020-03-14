@@ -247,11 +247,8 @@ public class Player : MonoBehaviour
     public void OnPickup()
     {
         _audioSource.PlayOneShot(_audioPickup);
-
-        if(_lifePoints != _maxLifePoints)
-        {
-            _pickupCtr += 1;
-        }
+        
+        _pickupCtr += 1;
 
         if (_pickupCtr == 3)
         {
