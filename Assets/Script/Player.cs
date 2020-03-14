@@ -124,8 +124,8 @@ public class Player : MonoBehaviour
         {
             if(_isStomping == true)
             {
-                _uiManager.UpdateScore(_score);
-                
+                _uiManager.UpdateScore(_score);                
+                _gameManager.AddKillCount();    
                 Destroy(other.gameObject);
             }
             else
@@ -168,7 +168,7 @@ public class Player : MonoBehaviour
                 _canSecondJump = true;
                 _isInAir = false;
 
-                if (tag == "Beam" || tag == "Floor")
+                if (tag == "Floor")
                 {
                     _isStomping = false;
                 }

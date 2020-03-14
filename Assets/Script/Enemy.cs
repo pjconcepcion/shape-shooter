@@ -185,11 +185,19 @@ public class Enemy : MonoBehaviour
     {
         _lifePoints -= 1;
         if (_lifePoints < 1)
-        {
+        {            
             _uiManager.UpdateScore(_score);
             Destroy(this.gameObject);
             GameObject newBreak = Instantiate(_breakPrefab, transform.position, Quaternion.identity);
             newBreak.transform.parent = transform.parent;
+
+            GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+            gameManager.AddKillCount();
         }
+    }
+
+    public void SetSpeed(float speed)
+    {
+        _speed = speed;
     }
 }

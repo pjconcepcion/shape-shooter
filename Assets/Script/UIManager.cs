@@ -112,6 +112,14 @@ public class UIManager : MonoBehaviour
         _resumeButton.GetComponentInChildren<Text>().text = "Resume";
     }
 
+    public void NextLevel()
+    {
+        _pauseText.text = "Level up!";
+        _scorePauseText.text = "Enemies are faster!";
+        _scoreText.gameObject.SetActive(true);
+        _resumeButton.GetComponentInChildren<Text>().text = "Continue";
+    }
+
     public void QuitGame()
     {        
         GameManager gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
