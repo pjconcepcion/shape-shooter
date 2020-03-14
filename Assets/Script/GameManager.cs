@@ -23,14 +23,19 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private AudioClip _audioGameStart;
 
+    private string MAIN_MENU = "MainMenu";
+
     private bool _isGameReady = false;  
     private bool _isGameOver = false;
     private bool _isGamePause = false;
     private bool _isPlayGameOver = false;
+    private bool _isNextLevel = false;
+    private int _spawnCount = 5;
+    private int _spawnRate = 5;
+    private int _playerKillCount = 0;
     private SpawnManager _spawnManager;
     private UIManager _uiManager;
     private AudioSource _audioSource;
-    private string MAIN_MENU = "MainMenu";
 
     // Start is called before the first frame update
     private void Start()
@@ -66,12 +71,12 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         _pauseMenuPanel.SetActive(_isGamePause);
         _helpPanel.SetActive(_isGamePause);
+        _spawnManager.NextLevel(_spawnCount);
     }
 
     // Update is called once per frame
     private void Update()
     {
-
         if(!_isGameOver)
         {
             if(_isGameReady)
@@ -106,7 +111,7 @@ public class GameManager : MonoBehaviour
                     _isGameReady = true;
                     _audioSource.PlayOneShot(_audioGameStart);
                     _uiManager.StartGame();
-                    Time.timeScale = 1f;
+                    Time.timeScale = 1f;                    
                 }
 
                 if(Input.GetKeyDown(KeyCode.Escape))
@@ -198,5 +203,22 @@ public class GameManager : MonoBehaviour
     public void QuitGame()
     {
         SceneManager.LoadScene(MAIN_MENU);
+    }
+
+    public void AddKillCount()
+    {
+        _playerKillCount += 1;
+        Debug.Log(_playerKillCount);
+
+        if(_playerKillCount == _spawnCount)
+        {
+            _playerKillCount = 0;
+            _spawnCount += _spawnRate;
+            _isNextLevel = true;
+            _spawnManager.NextLevel(_spawnCount);
+            _pauseMenuPanel.SetActive(true);
+            _uiManager.NextLevel();
+            Time.timeScale = 0f;
+        }
     }
 }
